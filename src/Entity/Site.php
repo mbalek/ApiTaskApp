@@ -26,6 +26,11 @@ class Site
      */
     private $url;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Client::class, mappedBy="site")
+     */
+    private $clients;
+
 
     public function __construct()
     {
@@ -45,6 +50,37 @@ class Site
     public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    public function addClient(Client $client): self
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients[] = $client;
+            $client->setSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClient(Client $client): self
+    {
+        if ($this->clients->contains($client)) {
+            $this->clients->removeElement($client);
+            // set the owning side to null (unless already changed)
+            if ($client->getSite() === $this) {
+                $client->setSite(null);
+            }
+        }
 
         return $this;
     }

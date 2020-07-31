@@ -60,6 +60,12 @@ class Client
      */
     private $tags;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Site::class, inversedBy="clients")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $site;
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -176,6 +182,18 @@ class Client
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
         }
+
+        return $this;
+    }
+
+    public function getSite(): ?Site
+    {
+        return $this->site;
+    }
+
+    public function setSite(?Site $site): self
+    {
+        $this->site = $site;
 
         return $this;
     }

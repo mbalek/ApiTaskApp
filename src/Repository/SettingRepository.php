@@ -18,5 +18,4 @@ class SettingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Setting::class);
     }
-
 }

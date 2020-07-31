@@ -9,8 +9,10 @@
 namespace App\Service;
 
 
+use App\Entity\Client;
 use App\Entity\Setting;
 use App\Entity\Site;
+use App\Entity\Tag;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Exception\ExceptionInterface;
@@ -62,7 +64,7 @@ class ClientService
 
         foreach($clients as $client)
         {
-            $site = $this->getClientUrl(/*$client[0]*/ '');
+            $site = $this->getClientUrl($client[0]);
             $tags = $this->getClientTags($client[1]);
 
             $this->em->flush();
@@ -76,8 +78,34 @@ class ClientService
         }
     }
 
-    protected function checkIfClientExists()
-    {}
+    protected function checkIfClientExists(Site $site, array $tags, array $clientJson, Setting $sett)
+    {
+        $client = $this->clientRepo->findOneBy(['date' => $clientJson[2], "estimatedRevenue" => $clientJson[3],
+                    "adImpressions" => $clientJson[4], "clicks" => $clientJson[6]]);
+
+        //TODO dorobic zapytanie do repo do wyszukania danego clienta z site,tags
+        //TODO dokonczyc insertClient i checkIfClientExists
+        //TODO zrobic komende do konsoli dla wywolania zapytania do api a nastepnie case ktory rozdzieli to do odpowiedniego service
+        //TODO zrobic service optadService ktory zajmie sie handlowaniem komendy
+
+
+    }
+
+    protected function insertClient(Site $site, array $tags, array $clientJson, Setting $sett)
+    {
+        $client = new Client();
+        $client->setDate($clientJson[2]);
+        $client->setEstimatedRevenue($clientJson[3]);
+        $client->setAdImpressions($clientJson[4]);
+        $client->setAdEcpm($clientJson[5]);
+        $client->setClicks($clientJson[6]);
+        $client->setAdCtr($clientJson[7]);
+        $client->setSetting($sett);
+        $client->setSite($site);
+        foreach($tags as $tag){
+            $client->addTag($tag);
+        }
+    }
 
     /**
      * @param string $tags
