@@ -1,0 +1,58 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Ikki
+ * Date: 31.07.2020
+ * Time: 09:08
+ */
+
+namespace App\Service;
+
+
+use http\Env\Response;
+use phpDocumentor\Reflection\DocBlock\Tags\Method;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+class ApiClientService
+{
+    /**
+     * @var HttpClientInterface
+     */
+    private $client;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger)
+    {
+        $this->client = $client;
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param string $method
+     * @param array $params
+     * @param string $url
+     * @return array
+     */
+    public function getApiResponse(string $method, array $params, string $url): array
+    {
+        try{
+            $response = $this->client->request($method, $url, $params);
+            if($response->getStatusCode() >= 200 && $response->getStatusCode() <= 299)
+                return $response->toArray();
+
+            return ['statusCode' => $response->getStatusCode(), 'errors' => $response->getContent(false)];
+        } catch(ExceptionInterface $e){
+            $this->logger->error( $e->getMessage());
+        }
+        return [];
+    }
+
+}

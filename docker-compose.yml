@@ -36,3 +36,12 @@ services:
         - .:/application
         - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
 
+    phpmyadmin:
+      image: phpmyadmin/phpmyadmin:5.0.1
+      restart: always
+      environment:
+        PMA_HOST: mysql
+        PMA_USER: root
+        PMA_PASSWORD: secret
+      ports:
+        - "8080:80"
