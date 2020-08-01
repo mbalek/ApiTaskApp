@@ -8,14 +8,9 @@
 
 namespace App\Service;
 
-
-use http\Env\Response;
-use phpDocumentor\Reflection\DocBlock\Tags\Method;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ApiClientService
 {

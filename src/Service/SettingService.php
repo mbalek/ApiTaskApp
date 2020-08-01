@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Ikki
- * Date: 31.07.2020
- * Time: 14:05
- */
 
 namespace App\Service;
 
@@ -46,7 +40,6 @@ class SettingService
         $this->validator = $validator;
         $this->logger = $logger;
     }
-
 
     /**
      * @param array $setting

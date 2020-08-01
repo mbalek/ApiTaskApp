@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Ikki
- * Date: 31.07.2020
- * Time: 13:42
- */
 
 namespace App\Service;
 
@@ -12,7 +6,6 @@ namespace App\Service;
 use App\Entity\Client;
 use App\Entity\Setting;
 use App\Entity\Site;
-use App\Entity\Tag;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -21,7 +14,7 @@ use Symfony\Component\Validator\Exception\ExceptionInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ClientService
+class ClientService implements ApiServiceInterface
 {
     /**
      * @var ClientRepository
@@ -53,6 +46,9 @@ class ClientService
      */
     private $validator;
 
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     public function __construct(ClientRepository $clientRepo, TagService $tagService, EntityManagerInterface $em,
@@ -68,8 +64,16 @@ class ClientService
         $this->logger = $logger;
     }
 
-    public function computeClients(array $clients, array $setting)
+    /**
+     * @param array $response
+     * @return bool|string
+     * @throws \Exception
+     */
+    public function compute(array $response)
     {
+        $clients = $response['data'];
+        $setting = $response['settings'];
+
         try{
         $sett = $this->getClientSetting($setting);
 
@@ -93,11 +97,18 @@ class ClientService
         }
     }
 
+    /**
+     * @param Site $site
+     * @param array $tags
+     * @param array $clientJson
+     * @param Setting $sett
+     * @return Client|mixed|null
+     * @throws \Exception
+     */
     protected function checkIfClientExists(Site $site, array $tags, array $clientJson, Setting $sett)
     {
         try {
             $client = $this->clientRepo->findClient($site, $tags, $clientJson, $sett);
-            dump($client);
         } catch (NonUniqueResultException $exception){
             $client = null;
         }
@@ -106,12 +117,6 @@ class ClientService
             $client = $this->insertClient($site, $tags, $clientJson, $sett);
 
         return $client;
-        //TODO dorobic zapytanie do repo do wyszukania danego clienta z site,tags
-        //TODO dokonczyc insertClient i checkIfClientExists
-        //TODO zrobic komende do konsoli dla wywolania zapytania do api a nastepnie case ktory rozdzieli to do odpowiedniego service
-        //TODO zrobic service optadService ktory zajmie sie handlowaniem komendy
-
-
     }
 
     /**

@@ -67,7 +67,6 @@ class ClientRepository extends ServiceEntityRepository
                 ->andWhere('t'.$i.'.name = :name_'.$i)
                 ->setParameter(':name_'.$i , $tags[$i]->getName());
         }
-        dump($qb);
 
         return $qb->getQuery()
             ->getOneOrNullResult();
