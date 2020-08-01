@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Client;
+use App\Entity\Setting;
+use App\Entity\Site;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,32 +21,55 @@ class ClientRepository extends ServiceEntityRepository
         parent::__construct($registry, Client::class);
     }
 
-    // /**
-    //  * @return Client[] Returns an array of Client objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param Site $site
+     * @param array $tags
+     * @param array $clientJson
+     * @param Setting $setting
+     * @return mixed
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Exception
+     */
+    public function findClient(Site $site, array $tags, array $clientJson, Setting $setting )
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+        $qb = $this->createQueryBuilder('c')
+            ->select('c')
+            ->join('c.setting' , 'sett')
+            ->join('c.site' , 'site')
+            ->andWhere('c.date = :date')
+            ->andWhere('c.estimatedRevenue = :revenue')
+            ->andWhere('c.adImpressions = :impressions')
+            ->andWhere('c.adEcpm = :adEcpm')
+            ->andWhere('c.clicks = :clicks')
+            ->andWhere('c.adCtr = :adCtr')
+            ->andWhere('sett.currency = :curr')
+            ->andWhere('sett.periodLength = :periodLength')
+            ->setParameter(':date', new \DateTime($clientJson[2]))
+            ->setParameter(':revenue', $clientJson[3])
+            ->setParameter(':impressions', $clientJson[4])
+            ->setParameter(':adEcpm', $clientJson[5])
+            ->setParameter(':clicks', $clientJson[6])
+            ->setParameter(':adCtr', $clientJson[7])
+            ->setParameter(':curr', $setting->getCurrency())
+            ->setParameter(':periodLength', $setting->getPeriodLength())
         ;
-    }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Client
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if(!is_null($setting->getGroupBy())){
+            $qb->andWhere('sett.groupBy = :groupBy')
+                ->setParameter(':groupBy' ,$setting->getGroupBy());
+        }
+
+        $qb->andWhere('site.url = :url')
+            ->setParameter(':url' , $site->getUrl());
+
+        for($i=0;$i<count($tags);$i++){
+            $qb ->join('c.tags' , 't'.$i)
+                ->andWhere('t'.$i.'.name = :name_'.$i)
+                ->setParameter(':name_'.$i , $tags[$i]->getName());
+        }
+        dump($qb);
+
+        return $qb->getQuery()
+            ->getOneOrNullResult();
     }
-    */
 }

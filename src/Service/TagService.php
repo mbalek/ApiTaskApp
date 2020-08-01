@@ -68,9 +68,9 @@ class TagService
 
     /**
      * @param string $tagString
-     * @return Tag|string
+     * @return Tag|null
      */
-    public function checkIfTagExists(string $tagString)
+    public function checkIfTagExists(string $tagString):?Tag
     {
         $tag = $this->tagRepo->findOneBy(['name' => $tagString]);
 
@@ -82,9 +82,9 @@ class TagService
 
     /**
      * @param string $tagString
-     * @return Tag|string
+     * @return Tag
      */
-    public function insertTag(string $tagString)
+    public function insertTag(string $tagString):Tag
     {
         $tag = new Tag();
         $tag->setName($tagString);

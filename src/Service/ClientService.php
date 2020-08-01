@@ -15,7 +15,11 @@ use App\Entity\Site;
 use App\Entity\Tag;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Exception\ExceptionInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientService
 {
@@ -44,14 +48,24 @@ class ClientService
      */
     private $em;
 
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    private $logger;
+
     public function __construct(ClientRepository $clientRepo, TagService $tagService, EntityManagerInterface $em,
-                                 SiteService $siteService, SettingService $settingService)
+                                SiteService $siteService, SettingService $settingService, ValidatorInterface $validator,
+                                LoggerInterface $logger)
     {
         $this->clientRepo = $clientRepo;
         $this->tagService = $tagService;
         $this->siteService = $siteService;
         $this->settingService = $settingService;
         $this->em = $em;
+        $this->validator = $validator;
+        $this->logger = $logger;
     }
 
     public function computeClients(array $clients, array $setting)
@@ -66,6 +80,7 @@ class ClientService
         {
             $site = $this->getClientUrl($client[0]);
             $tags = $this->getClientTags($client[1]);
+            $this->checkIfClientExists($site, $tags, $client, $sett);
 
             $this->em->flush();
         }
@@ -80,9 +95,17 @@ class ClientService
 
     protected function checkIfClientExists(Site $site, array $tags, array $clientJson, Setting $sett)
     {
-        $client = $this->clientRepo->findOneBy(['date' => $clientJson[2], "estimatedRevenue" => $clientJson[3],
-                    "adImpressions" => $clientJson[4], "clicks" => $clientJson[6]]);
+        try {
+            $client = $this->clientRepo->findClient($site, $tags, $clientJson, $sett);
+            dump($client);
+        } catch (NonUniqueResultException $exception){
+            $client = null;
+        }
 
+        if(null === $client)
+            $client = $this->insertClient($site, $tags, $clientJson, $sett);
+
+        return $client;
         //TODO dorobic zapytanie do repo do wyszukania danego clienta z site,tags
         //TODO dokonczyc insertClient i checkIfClientExists
         //TODO zrobic komende do konsoli dla wywolania zapytania do api a nastepnie case ktory rozdzieli to do odpowiedniego service
@@ -91,10 +114,18 @@ class ClientService
 
     }
 
-    protected function insertClient(Site $site, array $tags, array $clientJson, Setting $sett)
+    /**
+     * @param Site $site
+     * @param array $tags
+     * @param array $clientJson
+     * @param Setting $sett
+     * @return Client
+     * @throws \Exception
+     */
+    protected function insertClient(Site $site, array $tags, array $clientJson, Setting $sett): Client
     {
         $client = new Client();
-        $client->setDate($clientJson[2]);
+        $client->setDate(new \DateTime($clientJson[2]));
         $client->setEstimatedRevenue($clientJson[3]);
         $client->setAdImpressions($clientJson[4]);
         $client->setAdEcpm($clientJson[5]);
@@ -105,6 +136,21 @@ class ClientService
         foreach($tags as $tag){
             $client->addTag($tag);
         }
+
+        $errors = $this->validator->validate($client);
+        if(count($errors) > 0){
+            $errorString = (string) $errors;
+            $this->logger->warning('Failed to create Client entity cause of validation errors below');
+            $this->logger->warning($errorString);
+
+            throw new ValidatorException('Failed to create Setting entity \n'.$errorString);
+        }
+
+        $this->em->persist($client);
+
+        $this->logger->info('Creation of entity Setting successful');
+
+        return $client;
     }
 
     /**

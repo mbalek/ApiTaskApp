@@ -47,11 +47,12 @@ class SettingService
         $this->logger = $logger;
     }
 
+
     /**
      * @param array $setting
-     * @return Setting|string
+     * @return Setting|null
      */
-    public function checkIfSettingExists(array $setting)
+    public function checkIfSettingExists(array $setting):?Setting
     {
         $sett = $this->settingRepo->findOneBy(['currency' => $setting['currency'], 'periodLength' => $setting['PeriodLength']]);
 
@@ -63,9 +64,9 @@ class SettingService
 
     /**
      * @param array $setting
-     * @return Setting|string
+     * @return Setting
      */
-    public function insertSetting(array $setting)
+    public function insertSetting(array $setting):Setting
     {
         $sett = new Setting();
         $sett->setCurrency($setting['currency']);

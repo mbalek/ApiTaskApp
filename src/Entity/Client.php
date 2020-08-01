@@ -45,7 +45,7 @@ class Client
     private $clicks;
 
     /**
-     * @ORM\Column(type="decimal", precision=8, scale=1)
+     * @ORM\Column(type="decimal", precision=8, scale=2)
      */
     private $adCtr;
 

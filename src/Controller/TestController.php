@@ -32,8 +32,8 @@ class TestController extends AbstractController
               ],
              'query' => [
                  'key' => $this->optadApiKey,
-                 'startDate' => '2019-07-01',
-                 'endDate' => '2020-10-30',
+                 'startDate' => '2019-05-14',
+                 'endDate' => '2020-12-15',
                 ]],
             $this->optadApiBaseUri.'get');
        if(!array_key_exists('errors' , $response)){

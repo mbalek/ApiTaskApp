@@ -44,7 +44,11 @@ class SiteService
         $this->logger = $logger;
     }
 
-    public function checkIfSiteExists(string $url)
+    /**
+     * @param string $url
+     * @return Site|null
+     */
+    public function checkIfSiteExists(string $url):?Site
     {
         $site = $this->siteRepo->findOneBy(['url' => $url]);
 
@@ -54,7 +58,11 @@ class SiteService
         return $site;
     }
 
-    public function insertSite(string $url)
+    /**
+     * @param string $url
+     * @return Site
+     */
+    public function insertSite(string $url):Site
     {
         $site = new Site();
         $site->setUrl($url);
