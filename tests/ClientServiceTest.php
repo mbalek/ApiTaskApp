@@ -65,7 +65,6 @@ class ClientServiceTest extends KernelTestCase
         array_push($tags, $tag2);
 
         $setting = new Setting();
-        $setting->setPeriodLength(10);
         $setting->setCurrency('EUR');
 
         $clientJson = [
@@ -146,7 +145,6 @@ class ClientServiceTest extends KernelTestCase
         array_push($tags, $tag2);
 
         $setting = new Setting();
-        $setting->setPeriodLength(10);
         $setting->setCurrency('EUR');
 
         $clientJson = [
@@ -204,7 +202,6 @@ class ClientServiceTest extends KernelTestCase
         array_push($tags, $tag2);
 
         $setting = new Setting();
-        $setting->setPeriodLength(10);
         $setting->setCurrency('PLN');
 
         $clientJsonCorrect = [

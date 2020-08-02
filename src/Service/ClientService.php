@@ -118,6 +118,8 @@ class ClientService implements ApiServiceInterface
 
         if(null === $client)
             $client = $this->insertClient($site, $tags, $clientJson, $sett);
+        elseif(null !== $client)
+            $client = $this->updateClient($clientJson, $client);
 
         return $client;
     }
@@ -159,6 +161,32 @@ class ClientService implements ApiServiceInterface
         }
 
         $this->em->persist($client);
+
+        $this->logger->info('Creation of entity Setting successful');
+
+        return $client;
+    }
+
+    public function updateClient(array $clientJson, Client $client)
+    {
+        try{
+            $client->setEstimatedRevenue($clientJson[3]);
+            $client->setAdImpressions($clientJson[4]);
+            $client->setAdEcpm($clientJson[5]);
+            $client->setClicks($clientJson[6]);
+            $client->setAdCtr($clientJson[7]);
+        }catch (\TypeError $e){
+            throw new \TypeError('Wrong parameter for entity. \n'.$e->getMessage());
+        }
+
+        $errors = $this->validator->validate($client);
+        if(count($errors) > 0){
+            $errorString = (string) $errors;
+            $this->logger->warning('Failed to create Client entity cause of validation errors below');
+            $this->logger->warning($errorString);
+
+            throw new ValidatorException('Failed to create Setting entity \n'.$errorString);
+        }
 
         $this->logger->info('Creation of entity Setting successful');
 

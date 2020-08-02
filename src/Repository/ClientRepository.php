@@ -37,26 +37,22 @@ class ClientRepository extends ServiceEntityRepository
             ->join('c.setting' , 'sett')
             ->join('c.site' , 'site')
             ->andWhere('c.date = :date')
+            ->andWhere('sett.currency = :curr')
+            ->setParameter(':date', new \DateTime($clientJson[2]))
+            ->setParameter(':curr', $setting->getCurrency());
+
+        if((new \DateTime())->format('Y-m-d') > (new \DateTime($clientJson[2]))->format('Y-m-d')){
+        $qb
             ->andWhere('c.estimatedRevenue = :revenue')
             ->andWhere('c.adImpressions = :impressions')
             ->andWhere('c.adEcpm = :adEcpm')
             ->andWhere('c.clicks = :clicks')
             ->andWhere('c.adCtr = :adCtr')
-            ->andWhere('sett.currency = :curr')
-            ->andWhere('sett.periodLength = :periodLength')
-            ->setParameter(':date', new \DateTime($clientJson[2]))
             ->setParameter(':revenue', $clientJson[3])
             ->setParameter(':impressions', $clientJson[4])
             ->setParameter(':adEcpm', $clientJson[5])
             ->setParameter(':clicks', $clientJson[6])
-            ->setParameter(':adCtr', $clientJson[7])
-            ->setParameter(':curr', $setting->getCurrency())
-            ->setParameter(':periodLength', $setting->getPeriodLength())
-        ;
-
-        if(!is_null($setting->getGroupBy())){
-            $qb->andWhere('sett.groupBy = :groupBy')
-                ->setParameter(':groupBy' ,$setting->getGroupBy());
+            ->setParameter(':adCtr', $clientJson[7]);
         }
 
         $qb->andWhere('site.url = :url')

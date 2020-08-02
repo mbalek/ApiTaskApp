@@ -40,12 +40,11 @@ class SettingServiceTest extends KernelTestCase
     {
         $setting = new Setting();
         $setting->setCurrency('PLN');
-        $setting->setPeriodLength(10);
 
-        $settingArrayExisting = ['currency' => 'EUR', 'PeriodLength' => 10, 'groupby' => ''];
-        $settingArrayNonExisting = ['currency' => 'PLN', 'PeriodLength' => 10, 'groupby' => ''];
+        $settingArrayExisting = ['currency' => 'EUR'];
+        $settingArrayNonExisting = ['currency' => 'PLN'];
 
-        $settingInDb = $this->em->getRepository(Setting::class)->findOneBy(['currency' => 'EUR', 'periodLength' => 10]);
+        $settingInDb = $this->em->getRepository(Setting::class)->findOneBy(['currency' => 'EUR']);
 
         $settingService = $this->getMockBuilder(SettingService::class)
             ->setConstructorArgs([ $this->em->getRepository(\App\Entity\Setting::class), $this->em, $this->validator, $this->logger])
@@ -72,17 +71,13 @@ class SettingServiceTest extends KernelTestCase
 
         $setting = new Setting();
         $setting->setCurrency($rand);
-        $setting->setPeriodLength(10);
-        $settingArray = ['currency' => $rand, 'PeriodLength' => 10, 'groupby' => ''];
+        $settingArray = ['currency' => $rand];
 
         $this->assertEquals($setting, $settingService->insertSetting($settingArray));
 
         $this->expectException(ValidatorException::class);
         $settingService->insertSetting([]);
-        $settingService->insertSetting(['currency' => 'pln' , 'dsadsa' => 2, 'groupby' => '']);
-        $settingService->insertSetting(['sda' => 'pln' , 'PeriodLength' => 10, 'groupby' => '']);
-        $settingService->insertSetting(['currency' => 'pln' , 'PeriodLength' => 1, 'dsad' => '']);
-        $settingService->insertSetting(['currency' => 12 , 'PeriodLength' => 'dsada', 'dsad' => '']);
+        $settingService->insertSetting(['currency' => 'pln' ]);
     }
 
 }

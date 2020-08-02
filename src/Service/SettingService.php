@@ -47,7 +47,7 @@ class SettingService
      */
     public function checkIfSettingExists(array $setting):?Setting
     {
-        $sett = $this->settingRepo->findOneBy(['currency' => $setting['currency'], 'periodLength' => $setting['PeriodLength']]);
+        $sett = $this->settingRepo->findOneBy(['currency' => $setting['currency']]);
 
         if(null === $sett)
             $sett = $this->insertSetting($setting);
@@ -61,14 +61,11 @@ class SettingService
      */
     public function insertSetting(array $setting):Setting
     {
-        if(empty($setting) || !array_key_exists('currency', $setting) || !array_key_exists('PeriodLength', $setting)
-            || !array_key_exists('groupby', $setting))
+        if(empty($setting) || !array_key_exists('currency', $setting))
             throw new ValidatorException('Failed to create Setting entity , param array isnt correct\n');
 
         $sett = new Setting();
         $sett->setCurrency($setting['currency']);
-        $sett->setPeriodLength($setting['PeriodLength']);
-        $sett->setGroupBy($setting['groupby']);
 
         $errors = $this->validator->validate($sett);
         if(count($errors) > 0){

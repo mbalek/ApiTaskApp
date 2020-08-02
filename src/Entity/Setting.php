@@ -26,17 +26,6 @@ class Setting
     private $currency;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Assert\NotBlank
-     */
-    private $periodLength;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $groupBy;
-
-    /**
      * @ORM\OneToMany(targetEntity=Client::class, mappedBy="setting")
      */
     private $clients;
@@ -59,30 +48,6 @@ class Setting
     public function setCurrency(string $currency): self
     {
         $this->currency = $currency;
-
-        return $this;
-    }
-
-    public function getPeriodLength(): ?int
-    {
-        return $this->periodLength;
-    }
-
-    public function setPeriodLength(int $periodLength): self
-    {
-        $this->periodLength = $periodLength;
-
-        return $this;
-    }
-
-    public function getGroupBy(): ?string
-    {
-        return $this->groupBy;
-    }
-
-    public function setGroupBy(?string $groupBy): self
-    {
-        $this->groupBy = $groupBy;
 
         return $this;
     }
