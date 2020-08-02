@@ -39,8 +39,7 @@ class Optad360Service
             $queryArray['query']+=[$temp[0] => $temp[1]];
         }
 
-        $response = $this->apiClientService->getApiResponse(strtoupper($params['method']), $queryArray,
-                                            $this->optadApiBaseUri.strtolower($params['url']));
+        $response = $this->makeApiCall($params, $queryArray);
 
         if(!array_key_exists('errors' , $response) && !array_key_exists('msg', $response)){
             $result = $this->clientService->compute($response);
@@ -52,4 +51,10 @@ class Optad360Service
     public function handlePostCommand(){/*TODO if needed*/}
     public function handlePutCommand(){/*TODO if needed*/}
     public function handleDeleteCommand(){/*TODO if needed*/}
+
+    protected function makeApiCall(array $params, array $queryArray)
+    {
+        return $response = $this->apiClientService->getApiResponse(strtoupper($params['method']), $queryArray,
+            $this->optadApiBaseUri.strtolower($params['url']));
+    }
 }
