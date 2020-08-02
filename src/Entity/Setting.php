@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=SettingRepository::class)
+ * @ORM\Entity(repositoryClass=App\Repository\SettingRepository::class)
  */
 class Setting
 {

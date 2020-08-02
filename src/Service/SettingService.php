@@ -61,6 +61,10 @@ class SettingService
      */
     public function insertSetting(array $setting):Setting
     {
+        if(empty($setting) || !array_key_exists('currency', $setting) || !array_key_exists('PeriodLength', $setting)
+            || !array_key_exists('groupby', $setting))
+            throw new ValidatorException('Failed to create Setting entity , param array isnt correct\n');
+
         $sett = new Setting();
         $sett->setCurrency($setting['currency']);
         $sett->setPeriodLength($setting['PeriodLength']);

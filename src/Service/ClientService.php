@@ -71,6 +71,9 @@ class ClientService implements ApiServiceInterface
      */
     public function compute(array $response)
     {
+        if(!array_key_exists('data',$response) || !array_key_exists('settings' , $response))
+            throw new ValidatorException('wrong array keys in response');
+
         $clients = $response['data'];
         $setting = $response['settings'];
 
@@ -105,7 +108,7 @@ class ClientService implements ApiServiceInterface
      * @return Client|mixed|null
      * @throws \Exception
      */
-    protected function checkIfClientExists(Site $site, array $tags, array $clientJson, Setting $sett)
+    public function checkIfClientExists(Site $site, array $tags, array $clientJson, Setting $sett)
     {
         try {
             $client = $this->clientRepo->findClient($site, $tags, $clientJson, $sett);
@@ -127,19 +130,23 @@ class ClientService implements ApiServiceInterface
      * @return Client
      * @throws \Exception
      */
-    protected function insertClient(Site $site, array $tags, array $clientJson, Setting $sett): Client
+    public function insertClient(Site $site, array $tags, array $clientJson, Setting $sett): Client
     {
         $client = new Client();
-        $client->setDate(new \DateTime($clientJson[2]));
-        $client->setEstimatedRevenue($clientJson[3]);
-        $client->setAdImpressions($clientJson[4]);
-        $client->setAdEcpm($clientJson[5]);
-        $client->setClicks($clientJson[6]);
-        $client->setAdCtr($clientJson[7]);
-        $client->setSetting($sett);
-        $client->setSite($site);
-        foreach($tags as $tag){
-            $client->addTag($tag);
+        try{
+            $client->setDate(new \DateTime($clientJson[2]));
+            $client->setEstimatedRevenue($clientJson[3]);
+            $client->setAdImpressions($clientJson[4]);
+            $client->setAdEcpm($clientJson[5]);
+            $client->setClicks($clientJson[6]);
+            $client->setAdCtr($clientJson[7]);
+            $client->setSetting($sett);
+            $client->setSite($site);
+            foreach($tags as $tag){
+                $client->addTag($tag);
+            }
+        }catch (\TypeError $e){
+            throw new \TypeError('Wrong parameter for entity. \n'.$e->getMessage());
         }
 
         $errors = $this->validator->validate($client);
