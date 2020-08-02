@@ -118,7 +118,7 @@ class ClientService implements ApiServiceInterface
 
         if(null === $client)
             $client = $this->insertClient($site, $tags, $clientJson, $sett);
-        elseif(null !== $client)
+        elseif(null !== $client && (new \DateTime())->format('Y-m-d') === $client->getDate()->format('Y-m-d'))
             $client = $this->updateClient($clientJson, $client);
 
         return $client;

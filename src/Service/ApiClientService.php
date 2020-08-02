@@ -43,8 +43,10 @@ class ApiClientService
             if($response->getStatusCode() >= 200 && $response->getStatusCode() <= 299)
                 return $response->toArray();
 
+            print_r(['statusCode' => $response->getStatusCode(), 'errors' => $response->getContent(false)]);
             return ['statusCode' => $response->getStatusCode(), 'errors' => $response->getContent(false)];
         } catch(ExceptionInterface $e){
+            print_r($e->getMessage());
             $this->logger->error( $e->getMessage());
         }
         return [];
